@@ -1,3 +1,5 @@
+pub mod interpreter;
+
 fn main() {
-    println!("Hello, world!");
+    println!("{:?}", interpreter::interpret(String::from("./fibonacci.urcl")));
 }
