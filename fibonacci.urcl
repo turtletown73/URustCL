@@ -1,0 +1,12 @@
+BITS 8
+MINREG 2
+MINHEAP 0
+MINSTACK 0
+RUN ROM
+
+IMM R1 0
+IMM R2 1
+.loop
+    ADD R1 R1 R2
+    ADD R2 R1 R2
+    JMP .loop

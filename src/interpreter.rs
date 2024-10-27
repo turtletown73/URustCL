@@ -241,26 +241,30 @@ pub fn interpret(dir: String) -> Interpreted {
         } else if x.starts_with("MINSTACK ") {
             headers.minstack = x.get(9..).as_slice().concat().trim().parse().unwrap();
         } else if x.starts_with(".") {
-            labels.push(Label { name: x.get(1..).as_slice().concat().trim().parse().unwrap(), line: i as u32 + 1});
+            labels.push(Label { name: x.get(1..).as_slice().concat().trim().parse().unwrap(), line: i as u32 + 2});
         } else {
             let mut instruction = Instruction {opcode: Opcode::ABS, args: Vec::new()};
-            for (i, x) in x.trim().split(" ").enumerate() {
-                if i as u32 == 1 {
-                    instruction.opcode = Opcode::from_str(x).unwrap();
-                } else {
-                    if (x.starts_with("R") || x.starts_with("$")) {
-                        let argument = Argument {argtype: ArgumentType::Register, value: ArgumentValue::U32(x.get(1..).as_slice().concat().trim().parse().unwrap())};
-                        instruction.args.push(argument);
-                    } else if x.starts_with(".") {
-                        let argument = Argument {argtype: ArgumentType::Label, value: ArgumentValue::String(x.get(1..).as_slice().concat())};
-                        instruction.args.push(argument);
-                    } else {
-                        let argument = Argument {argtype: ArgumentType::Immediate, value: ArgumentValue::U32(x.trim().parse().unwrap())};
-                        instruction.args.push(argument);
+            for (i, y) in x.trim().split(" ").enumerate() {
+                if !y.is_empty() {
+                    if i as u32 == 0 {
+                        instruction.opcode = Opcode::from_str(y).unwrap();
+                    } else if i as u32 >= 1 {
+                        if y.starts_with("R") || y.starts_with("$") {
+                            let argument = Argument {argtype: ArgumentType::Register, value: ArgumentValue::U32(y.get(1..).as_slice().concat().trim().parse().unwrap())};
+                            instruction.args.push(argument);
+                        } else if y.starts_with(".") {
+                            let argument = Argument {argtype: ArgumentType::Label, value: ArgumentValue::String(y.get(1..).as_slice().concat())};
+                            instruction.args.push(argument);
+                        } else {
+                            let argument = Argument {argtype: ArgumentType::Immediate, value: ArgumentValue::U32(String::from(y).parse::<u32>().expect("a"))};
+                            instruction.args.push(argument);
+                        }
                     }
                 }
             }
-            instructions.push(instruction);
+            if !x.is_empty() {
+                instructions.push(instruction);
+            }
         }
     }
 
